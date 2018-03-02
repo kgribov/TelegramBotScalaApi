@@ -41,7 +41,7 @@ class MessageSourceTest extends FunSuite with Matchers {
 
     val messages = source.getNewMessages()
 
-    messages.map(_.id).max should be (100)
+    messages.map(_.id).max should be ("100")
   }
 
   private def loadUpdates(returnResults: Map[Int, List[Update]]): (Int) => List[Update] = {
