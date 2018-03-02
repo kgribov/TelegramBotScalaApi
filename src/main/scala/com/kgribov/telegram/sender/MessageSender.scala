@@ -38,9 +38,9 @@ class MessageSender(apiKey: String,
     response match {
       case Success(body) => body
       case Failure(ex) => {
-        logger.error(s"Unable to send request $request. Try count: $tryCount", ex)
+        logger.error(s"Unable to send request [$request]. Try count: [$tryCount]", ex)
         if (tryCount == retries) {
-          throw new Exception("Max retries is reached for send request")
+          throw new UnableToSendRequest("Max retries is reached for send request", ex)
         } else {
           requestForResponse(request, tryCount + 1)
         }
@@ -62,4 +62,6 @@ class MessageSender(apiKey: String,
   private def getSendMessageUrl = botHostName + "sendMessage"
 
   private def getAnswerCallbackUrl = botHostName + "answerCallbackQuery"
+
+  class UnableToSendRequest(message: String, exception: Throwable) extends Exception(message, exception)
 }

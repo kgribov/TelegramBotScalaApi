@@ -4,11 +4,12 @@ import java.time.Clock
 
 import com.kgribov.telegram.model.{Message, MessageToSend}
 import com.kgribov.telegram.sender.MessageSender
+import com.typesafe.scalalogging.LazyLogging
 
 class MessageProcessor(anyMessageProcessors: List[Message => Option[String]],
                        simpleCommandsProcessors: Map[String, Message => Option[String]],
                        dialogsProcessors: Map[String, Message => DialogProcessor],
-                       messageSender: MessageSender) {
+                       messageSender: MessageSender) extends LazyLogging {
 
   private val dialogPool = new DialogPool(messageSender, Clock.systemDefaultZone())
 
@@ -19,6 +20,7 @@ class MessageProcessor(anyMessageProcessors: List[Message => Option[String]],
   }
 
   private def processAnyMessage(messages: List[Message]): Unit = {
+    logger.info(s"Going to process [${messages.size}] messages")
     val replyMessages = messages.flatMap(message => {
       anyMessageProcessors.map(processFun => {
         processFun(message)
@@ -29,8 +31,9 @@ class MessageProcessor(anyMessageProcessors: List[Message => Option[String]],
   }
 
   private def processCommands(messages: List[Message]): Unit = {
-    val replyMessages = messages
-      .filter(_.command.isDefined)
+    val commandsOnly = messages.filter(_.command.isDefined)
+    logger.info(s"Going to process [${commandsOnly.size}] messages with commands")
+    val replyMessages = commandsOnly
       .flatMap(message => {
         val command = message.command.get
         simpleCommandsProcessors
@@ -54,7 +57,7 @@ class MessageProcessor(anyMessageProcessors: List[Message => Option[String]],
 
     messageToCommand.foreach {
       case (command, messagesOfCommand) => messagesOfCommand.foreach(message => {
-        dialogPool.activateDialog(message.chat.id, dialogsProcessors(command)(message))
+        dialogPool.addDialog(message.chat.id, dialogsProcessors(command)(message))
       })
     }
   }

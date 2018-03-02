@@ -14,12 +14,14 @@ class DialogPool(messageSender: MessageSender,
 
   private val activeDialogs = new mutable.HashMap[Int, DialogProcessor]()
 
-  def activateDialog(chatId: Int, dialog: DialogProcessor): Unit = {
+  def addDialog(chatId: Int, dialog: DialogProcessor): Unit = {
     activeDialogs.put(chatId, dialog)
   }
 
   def processMessages(messages: List[Message]): Unit = {
     cleanDialogs()
+
+    logger.info(s"Current number of active dialogs is [${activeDialogs.size}]")
 
     val messagesToChat = messages.groupBy(_.chat.id)
     activeDialogs.keySet.foreach(key => {
@@ -32,7 +34,7 @@ class DialogPool(messageSender: MessageSender,
   private def processMessagesSafely(dialogProcessor: DialogProcessor, messages: Option[List[Message]]): Unit = {
     val processResult = Try(dialogProcessor.processMessages(messages))
     processResult match {
-      case Success(_) => logger.debug(s"Successfully process dialog messages: $messages")
+      case Success(_) => logger.debug(s"Successfully process dialog messages: [$messages]")
       case Failure(ex) => logger.error(s"Unable to process messages for dialog : [$messages]", ex)
     }
   }
