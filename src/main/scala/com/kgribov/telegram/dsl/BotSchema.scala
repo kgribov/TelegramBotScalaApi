@@ -1,10 +1,10 @@
 package com.kgribov.telegram.dsl
 
-import com.kgribov.telegram.handler.Bot
+import com.kgribov.telegram.bot.{Bot, StopBot, StopBotOnSignal}
 import com.kgribov.telegram.model.{Message, User}
 import com.kgribov.telegram.process.{DialogProcessor, MessageProcessor}
 import com.kgribov.telegram.sender.MessageSender
-import com.kgribov.telegram.source.{InMemoryOffsetStore, MessagesSource, TelegramUpdatesLoader}
+import com.kgribov.telegram.source.{FileBasedOffsetStore, InMemoryOffsetStore, MessagesSource, TelegramUpdatesLoader}
 
 class BotSchema(apiKey: String,
                 processAnyMessage: List[Message => Option[String]] = List(),
@@ -114,10 +114,11 @@ class BotSchema(apiKey: String,
     }
   }
 
-  def startBot(stopBot: => Boolean = false): Unit = {
+  def startBot(stopBot: StopBot = new StopBotOnSignal(),
+               withId: String = apiKey.split(":")(0)): Unit = {
     val messageSource = new MessagesSource(
       new TelegramUpdatesLoader(apiKey).loadUpdates,
-      new InMemoryOffsetStore
+      new FileBasedOffsetStore(withId)
     )
 
     val bot = new Bot(messageSource, createMessageProcessor())

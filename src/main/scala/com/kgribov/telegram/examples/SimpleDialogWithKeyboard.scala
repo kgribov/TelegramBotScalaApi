@@ -4,7 +4,7 @@ import com.kgribov.telegram.dsl._
 
 object SimpleDialogWithKeyboard extends App {
 
-  val apiKey = "your key here"
+  val apiKey = ""
 
   val askPersonalInfo = AskDialog(
     withUserOnly = true,

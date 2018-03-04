@@ -1,4 +1,4 @@
-package com.kgribov.telegram.handler
+package com.kgribov.telegram.bot
 
 import com.kgribov.telegram.model.Message
 import com.kgribov.telegram.process.MessageProcessor
@@ -11,8 +11,8 @@ class Bot(messageSource: MessagesSource,
           messageProcessor: MessageProcessor,
           loadPeriodSec: Int = 2) extends LazyLogging {
 
-  def start(stopBot: => Boolean = false): Unit = {
-    while (!stopBot) {
+  def start(stopBot: StopBot = new NeverStopBot): Unit = {
+    while (!stopBot()) {
       val newMessages = loadNewMessages
 
       messageProcessor.processMessages(newMessages)
