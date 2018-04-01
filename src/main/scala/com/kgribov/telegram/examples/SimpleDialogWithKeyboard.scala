@@ -18,7 +18,7 @@ object SimpleDialogWithKeyboard extends App {
     )
   )
 
-  val botSchema = new BotSchema(apiKey)
+  val botSchema = new BotSchema(apiKey, "simpleAsk")
     .startDialogOnCommand("ask", askPersonalInfo)
 
   botSchema.startBot()

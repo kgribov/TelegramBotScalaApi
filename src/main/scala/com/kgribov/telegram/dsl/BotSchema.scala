@@ -7,6 +7,7 @@ import com.kgribov.telegram.sender.MessageSender
 import com.kgribov.telegram.source.{FileBasedOffsetStore, InMemoryOffsetStore, MessagesSource, TelegramUpdatesLoader}
 
 class BotSchema(apiKey: String,
+                botName: String,
                 processAnyMessage: List[Message => Option[String]] = List(),
                 simpleCommandsProcessors: Map[String, Message => Option[String]] = Map(),
                 dialogsProcessors: Map[String, Message => DialogProcessor] = Map()) {
@@ -23,6 +24,7 @@ class BotSchema(apiKey: String,
 
     new BotSchema(
       apiKey,
+      botName,
       processFun :: processAnyMessage,
       simpleCommandsProcessors,
       dialogsProcessors
@@ -38,6 +40,7 @@ class BotSchema(apiKey: String,
 
     new BotSchema(
       apiKey,
+      botName,
       processFun :: processAnyMessage,
       simpleCommandsProcessors,
       dialogsProcessors
@@ -54,6 +57,7 @@ class BotSchema(apiKey: String,
 
     new BotSchema(
       apiKey,
+      botName,
       processAnyMessage,
       simpleCommandsProcessors + (command -> processFun),
       dialogsProcessors
@@ -69,6 +73,7 @@ class BotSchema(apiKey: String,
 
     new BotSchema(
       apiKey,
+      botName,
       processAnyMessage,
       simpleCommandsProcessors + (command -> processFun),
       dialogsProcessors
@@ -79,6 +84,7 @@ class BotSchema(apiKey: String,
     val dialogProcessor = dialogToProcessor(dialog)
     new BotSchema(
       apiKey,
+      botName,
       processAnyMessage,
       simpleCommandsProcessors,
       dialogsProcessors + (command -> dialogProcessor)
@@ -114,11 +120,10 @@ class BotSchema(apiKey: String,
     }
   }
 
-  def startBot(stopBot: StopBot = new StopBotOnSignal(),
-               withId: String = apiKey.split(":")(0)): Unit = {
+  def startBot(stopBot: StopBot = new StopBotOnSignal()): Unit = {
     val messageSource = new MessagesSource(
       new TelegramUpdatesLoader(apiKey).loadUpdates,
-      new FileBasedOffsetStore(withId)
+      new FileBasedOffsetStore(botName)
     )
 
     val bot = new Bot(messageSource, createMessageProcessor())

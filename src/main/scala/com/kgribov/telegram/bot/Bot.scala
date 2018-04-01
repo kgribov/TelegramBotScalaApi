@@ -26,7 +26,7 @@ class Bot(messageSource: MessagesSource,
 
     newMessages match {
       case Success(listOfMessages) => {
-        logger.info(s"Received new batch of messages, batch size is [${listOfMessages.size}]")
+        logger.info(s"Received new batch of messages, batch size is ${listOfMessages.size}")
         listOfMessages
       }
       case Failure(ex) => {

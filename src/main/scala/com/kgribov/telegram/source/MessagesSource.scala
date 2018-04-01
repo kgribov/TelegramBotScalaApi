@@ -9,7 +9,7 @@ class MessagesSource(loadUpdates: Int => List[Update], offsetStore: OffsetStore)
     val offset = offsetStore.loadOffset
     val updates = loadUpdates(offset)
 
-    logger.info(s"Load [${updates.size}] new messages")
+    logger.info(s"Load ${updates.size} new messages")
     logger.debug(s"Load next messages: $updates")
 
     val nextOffset = if (updates.isEmpty) {
@@ -18,7 +18,7 @@ class MessagesSource(loadUpdates: Int => List[Update], offsetStore: OffsetStore)
       updates.map(_.id).max + 1
     }
 
-    logger.info(s"Next offset is [$nextOffset]")
+    logger.info(s"Next offset is $nextOffset")
 
     offsetStore.store(nextOffset)
 

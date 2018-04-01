@@ -1,7 +1,8 @@
 
 lazy val telegramBotScalaApi = (project in file("."))
   .settings(
-    name := "telegram_bot_scala_api",
+    name := "telegram-bot-scala-api",
+    organization := "com.kgribov",
     version := "0.1",
     scalaVersion := "2.12.4",
     libraryDependencies ++= Dependencies.dependencies,

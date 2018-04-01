@@ -16,7 +16,7 @@ class MessageSender(apiKey: String,
   }
 
   def send(message: MessageToSend): Message = {
-    logger.info(s"Going to send message: $message")
+    logger.debug(s"Going to send message: $message")
     val replyMarkup = message.replyKeyboard match {
       case Some(keyboard) => Seq(("reply_markup", keyboardToJson(keyboard)))
       case None => Seq[(String, String)]()
@@ -38,7 +38,7 @@ class MessageSender(apiKey: String,
     response match {
       case Success(body) => body
       case Failure(ex) => {
-        logger.error(s"Unable to send request [$request]. Try count: [$tryCount]", ex)
+        logger.error(s"Unable to send request $request. Try count: $tryCount", ex)
         if (tryCount == retries) {
           throw new UnableToSendRequest("Max retries is reached for send request", ex)
         } else {

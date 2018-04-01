@@ -20,7 +20,7 @@ class MessageProcessor(anyMessageProcessors: List[Message => Option[String]],
   }
 
   private def processAnyMessage(messages: List[Message]): Unit = {
-    logger.info(s"Going to process [${messages.size}] messages")
+    logger.info(s"Going to process ${messages.size} messages")
     val replyMessages = messages.flatMap(message => {
       anyMessageProcessors.map(processFun => {
         processFun(message)
@@ -32,7 +32,7 @@ class MessageProcessor(anyMessageProcessors: List[Message => Option[String]],
 
   private def processCommands(messages: List[Message]): Unit = {
     val commandsOnly = messages.filter(_.command.isDefined)
-    logger.info(s"Going to process [${commandsOnly.size}] messages with commands")
+    logger.info(s"Going to process ${commandsOnly.size} messages with commands")
     val replyMessages = commandsOnly
       .flatMap(message => {
         val command = message.command.get
