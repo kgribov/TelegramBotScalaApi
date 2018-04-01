@@ -6,8 +6,7 @@ object SimpleDialogWithKeyboard extends App {
 
   val apiKey = ""
 
-  val askPersonalInfo = AskDialog(
-    withUserOnly = true,
+  val askPersonalInfo = Dialog(
     questions = Seq(
       askQuiz(Quiz("What is your gender", Seq("Male", "Female"))),
       askQuiz(Quiz("What is your age", Seq("Under 30", "30 and more"))),

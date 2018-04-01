@@ -84,7 +84,7 @@ class BotSchema(apiKey: String,
     )
   }
 
-  def startDialogOnCommand(command: String, dialog: AskDialog): BotSchema = {
+  def startDialogOnCommand(command: String, dialog: Dialog): BotSchema = {
     val dialogProcessor = dialogToProcessor(dialog)
     new BotSchema(
       apiKey,
@@ -104,7 +104,7 @@ class BotSchema(apiKey: String,
     )
   }
 
-  private def dialogToProcessor(dialog: AskDialog): Message => DialogProcessor = {
+  private def dialogToProcessor(dialog: Dialog): Message => DialogProcessor = {
     (message: Message) => {
       new DialogProcessor(
         message.chat.id,

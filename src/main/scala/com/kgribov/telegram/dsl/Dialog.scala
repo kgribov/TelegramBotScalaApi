@@ -8,9 +8,9 @@ import com.kgribov.telegram.sender.MessageSender
 
 import scala.concurrent.duration.Duration
 
-case class AskDialog(withUserOnly: Boolean = false,
-                     dialogTTL: Duration = Duration(5, TimeUnit.MINUTES),
-                     questions: Seq[AskQuestion])
+case class Dialog(withUserOnly: Boolean = true,
+                  dialogTTL: Duration = Duration(5, TimeUnit.MINUTES),
+                  questions: Seq[AskQuestion])
 
 trait AskQuestion {
   def toQuestion(messageSender: MessageSender): DialogAnswers => DialogQuestion
