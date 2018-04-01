@@ -31,10 +31,14 @@ class BotSchema(apiKey: String,
     )
   }
 
-  def replyOnMessage(process: Message => String): BotSchema = {
+  def replyOnMessage(filter: Message => Boolean = _ => true, reply: Message => String): BotSchema = {
     val processFun = new Function[Message, Option[String]] {
       override def apply(message: Message) = {
-        Some(process(message))
+        if (filter(message)) {
+          Some(reply(message))
+        } else {
+          None
+        }
       }
     }
 
