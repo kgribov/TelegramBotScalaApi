@@ -1,5 +1,6 @@
 package com.kgribov.telegram.source
 
+import com.kgribov.telegram.endpoints.TelegramEndpoints
 import com.kgribov.telegram.model.Update
 import com.kgribov.telegram.parser._
 import com.typesafe.scalalogging.LazyLogging
@@ -9,7 +10,7 @@ import scalaj.http.Http
 class TelegramUpdatesLoader(apiKey: String) extends LazyLogging {
 
   def loadUpdates(fromOffset: Int): List[Update] = {
-    val response = Http(getUpdatesUrl)
+    val response = Http(TelegramEndpoints.updatesUrl(apiKey))
       .param("offset", fromOffset.toString)
       .asString
 
@@ -22,10 +23,6 @@ class TelegramUpdatesLoader(apiKey: String) extends LazyLogging {
 
     parseUpdates(responseBody).map(_.toModel)
   }
-
-  private def botHostName: String = s"https://api.telegram.org/bot$apiKey/"
-
-  private def getUpdatesUrl = botHostName + "getUpdates"
 }
 
 class UnableToGetUpdates(returnCode: Int)

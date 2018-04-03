@@ -13,7 +13,9 @@ object Dependencies {
 
   lazy val jacksonScalaModule = "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.2"
 
-  lazy val testing = "org.scalatest" %% "scalatest" % "3.0.4" % "test"
+  lazy val cache = "com.github.blemale" %% "scaffeine" % "2.5.0" % "compile"
+
+  lazy val testing = "org.scalatest" %% "scalatest" % "3.0.4" % Test
 
   lazy val mock = "org.scalamock" %% "scalamock" % "4.1.0" % Test
 
@@ -23,6 +25,7 @@ object Dependencies {
     logbackLogging,
     jacksonCore,
     jacksonScalaModule,
+    cache,
     testing,
     mock
   )

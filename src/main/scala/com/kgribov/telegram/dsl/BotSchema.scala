@@ -3,14 +3,16 @@ package com.kgribov.telegram.dsl
 import com.kgribov.telegram.bot.{Bot, StopBot, StopBotOnSignal}
 import com.kgribov.telegram.model.{Message, User}
 import com.kgribov.telegram.process.{DialogProcessor, MessageProcessor}
+import com.kgribov.telegram.security._
 import com.kgribov.telegram.sender.MessageSender
-import com.kgribov.telegram.source.{FileBasedOffsetStore, InMemoryOffsetStore, MessagesSource, TelegramUpdatesLoader}
+import com.kgribov.telegram.source._
 
 class BotSchema(apiKey: String,
                 botName: String,
                 processAnyMessage: List[Message => Option[String]] = List(),
                 simpleCommandsProcessors: Map[String, Message => Option[String]] = Map(),
-                dialogsProcessors: Map[String, Message => DialogProcessor] = Map()) {
+                dialogsProcessors: Map[String, Message => DialogProcessor] = Map(),
+                commandsPermissions: Map[String, ChatPermission] = Map()) {
 
   val messageSender = new MessageSender(apiKey)
 
@@ -27,7 +29,8 @@ class BotSchema(apiKey: String,
       botName,
       processFun :: processAnyMessage,
       simpleCommandsProcessors,
-      dialogsProcessors
+      dialogsProcessors,
+      commandsPermissions
     )
   }
 
@@ -47,11 +50,12 @@ class BotSchema(apiKey: String,
       botName,
       processFun :: processAnyMessage,
       simpleCommandsProcessors,
-      dialogsProcessors
+      dialogsProcessors,
+      commandsPermissions
     )
   }
 
-  def onCommand(command: String, process: Message => Unit): BotSchema = {
+  def onCommand(command: String, process: Message => Unit, withPermissions: ChatPermission = allowEverything()): BotSchema = {
     val processFun = new Function[Message, Option[String]] {
       override def apply(message: Message) = {
         process(message)
@@ -64,11 +68,12 @@ class BotSchema(apiKey: String,
       botName,
       processAnyMessage,
       simpleCommandsProcessors + (command -> processFun),
-      dialogsProcessors
+      dialogsProcessors,
+      commandsPermissions + (command -> withPermissions)
     )
   }
 
-  def replyOnCommand(command: String, process: Message => String): BotSchema = {
+  def replyOnCommand(command: String, process: Message => String, withPermissions: ChatPermission = allowEverything()): BotSchema = {
     val processFun = new Function[Message, Option[String]] {
       override def apply(message: Message) = {
         Some(process(message))
@@ -80,18 +85,20 @@ class BotSchema(apiKey: String,
       botName,
       processAnyMessage,
       simpleCommandsProcessors + (command -> processFun),
-      dialogsProcessors
+      dialogsProcessors,
+      commandsPermissions + (command -> withPermissions)
     )
   }
 
-  def startDialogOnCommand(command: String, dialog: Dialog): BotSchema = {
+  def startDialogOnCommand(command: String, dialog: Dialog, withPermissions: ChatPermission = allowEverything()): BotSchema = {
     val dialogProcessor = dialogToProcessor(dialog)
     new BotSchema(
       apiKey,
       botName,
       processAnyMessage,
       simpleCommandsProcessors,
-      dialogsProcessors + (command -> dialogProcessor)
+      dialogsProcessors + (command -> dialogProcessor),
+      commandsPermissions + (command -> withPermissions)
     )
   }
 
@@ -100,6 +107,8 @@ class BotSchema(apiKey: String,
       processAnyMessage,
       simpleCommandsProcessors,
       dialogsProcessors,
+      commandsPermissions,
+      new MetaInfoSource(apiKey),
       messageSender
     )
   }
@@ -110,7 +119,7 @@ class BotSchema(apiKey: String,
         message.chat.id,
         dialog.dialogTTL,
         messageSender,
-        dialog.questions.toList.map(_.toQuestion(messageSender)),
+        dialog.questions.map(_.toQuestion(messageSender)),
         dialogWithUser(message.from, dialog.withUserOnly)
       )
     }

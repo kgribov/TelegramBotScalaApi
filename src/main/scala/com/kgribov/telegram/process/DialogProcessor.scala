@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 class DialogProcessor(chatId: Int,
                       dialogTimeout: Duration = Duration(5, TimeUnit.MINUTES),
                       messageSender: MessageSender,
-                      questions: List[DialogAnswers => DialogQuestion],
+                      questions: Iterable[DialogAnswers => DialogQuestion],
                       withUserOnly: Option[User],
                       now: ZonedDateTime = ZonedDateTime.now()) {
 

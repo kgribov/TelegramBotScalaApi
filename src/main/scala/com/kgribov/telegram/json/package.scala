@@ -30,6 +30,13 @@ package object json {
     }
   }
 
+  case class ChatMemberJson(@JsonProperty(required = true, value = "user") user: UserJson,
+                            @JsonProperty(required = true, value = "status") status: String) {
+    def toModel: User = {
+      user.toModel
+    }
+  }
+
   case class ChatJson(@JsonProperty(required = true, value = "id") id: Int,
                       @JsonProperty(value = "title") title: Option[String],
                       @JsonProperty(value = "description") description: Option[String],

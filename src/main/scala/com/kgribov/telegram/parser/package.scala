@@ -3,7 +3,7 @@ package com.kgribov.telegram
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import com.kgribov.telegram.json.{InlineKeyboardMarkup, MessageJson, UpdateJson}
+import com.kgribov.telegram.json.{ChatMemberJson, InlineKeyboardMarkup, MessageJson, UpdateJson}
 import com.kgribov.telegram.model.Keyboard
 import com.typesafe.scalalogging.LazyLogging
 
@@ -36,6 +36,15 @@ package object parser extends LazyLogging {
     }
   }
 
+  def parseAdminsResponse(json: String): List[ChatMemberJson] = {
+    val response = mapper.readValue[AdministratorsResponse](json)
+    if (response.ok) {
+      response.result
+    } else {
+      List()
+    }
+  }
+
   def parseMessage(json: String): MessageJson = {
     mapper.readValue[MessageJson](json)
   }
@@ -47,4 +56,6 @@ package object parser extends LazyLogging {
   private case class UpdatesResponse(ok: Boolean, result: List[UpdateJson])
 
   private case class MessageResponse(ok: Boolean, result: MessageJson)
+
+  private case class AdministratorsResponse(ok: Boolean, result: List[ChatMemberJson])
 }

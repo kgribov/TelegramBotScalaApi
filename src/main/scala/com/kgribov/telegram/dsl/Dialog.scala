@@ -10,7 +10,7 @@ import scala.concurrent.duration.Duration
 
 case class Dialog(withUserOnly: Boolean = true,
                   dialogTTL: Duration = Duration(5, TimeUnit.MINUTES),
-                  questions: Seq[AskQuestion])
+                  questions: Iterable[AskQuestion])
 
 trait AskQuestion {
   def toQuestion(messageSender: MessageSender): DialogAnswers => DialogQuestion

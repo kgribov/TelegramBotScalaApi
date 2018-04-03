@@ -1,11 +1,12 @@
 package com.kgribov.telegram.sender
 
+import com.kgribov.telegram.endpoints.TelegramEndpoints
+import com.kgribov.telegram.http._
 import com.kgribov.telegram.model.{KeyboardAlert, Message, MessageToSend}
 import com.kgribov.telegram.parser._
 import com.typesafe.scalalogging.LazyLogging
 
-import scala.util.{Failure, Success, Try}
-import scalaj.http.{Http, HttpRequest}
+import scalaj.http.Http
 
 class MessageSender(apiKey: String,
                     retries: Int = 15,
@@ -27,41 +28,18 @@ class MessageSender(apiKey: String,
       ("text", message.text)
     ) ++ replyMarkup
 
-    val request = Http(getSendMessageUrl).postForm(params)
-    val response = requestForResponse(request)
+    val request = Http(TelegramEndpoints.sendMessageUrl(apiKey)).postForm(params)
+    val response = requestForResponse(request, retries)
 
     parseMessageResponse(response).toModel
   }
 
-  private def requestForResponse(request: HttpRequest, tryCount: Int = 0): String = {
-    val response = Try(request.asString.body)
-    response match {
-      case Success(body) => body
-      case Failure(ex) => {
-        logger.error(s"Unable to send request $request. Try count: $tryCount", ex)
-        if (tryCount == retries) {
-          throw new UnableToSendRequest("Max retries is reached for send request", ex)
-        } else {
-          requestForResponse(request, tryCount + 1)
-        }
-      }
-    }
-  }
-
   def sendKeyboardAlert(keyboardAlert: KeyboardAlert): Unit = {
-    Http(getAnswerCallbackUrl)
+    Http(TelegramEndpoints.answerCallbackUrl(apiKey))
       .postForm(Seq(
         ("callback_query_id", keyboardAlert.messageId.toString),
         ("text", keyboardAlert.text),
         ("show_alert", keyboardAlert.showAlert.toString)
       )).asString
   }
-
-  private def botHostName: String = s"https://api.telegram.org/bot$apiKey/"
-
-  private def getSendMessageUrl = botHostName + "sendMessage"
-
-  private def getAnswerCallbackUrl = botHostName + "answerCallbackQuery"
-
-  class UnableToSendRequest(message: String, exception: Throwable) extends Exception(message, exception)
 }
