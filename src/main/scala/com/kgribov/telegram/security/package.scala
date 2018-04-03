@@ -26,24 +26,25 @@ package object security {
     new PrivateChatAllowed(onlyForUsers)
   }
 
-  class ChatPermissions(permissions: Seq[ChatPermission] =
-                        Seq(new GroupsAllowed(ANYONE), new PrivateChatAllowed())) extends ChatPermission {
+  private class ChatPermissions(permissions: Seq[ChatPermission] =
+                        Seq(new GroupsAllowed(), new PrivateChatAllowed())) extends ChatPermission {
 
     override def isAllowed(message: Message, metaInfoSource: MetaInfoSource): Boolean = {
       permissions.exists(_.isAllowed(message, metaInfoSource))
     }
   }
 
-  class GroupsAllowed(userType: UserType, onlyForGroups: Seq[Int] = Seq()) extends ChatPermission {
+  private class GroupsAllowed(userType: UserType = ANYONE, onlyForGroups: Seq[Int] = Seq()) extends ChatPermission {
     override def isAllowed(message: Message, metaInfoSource: MetaInfoSource): Boolean = {
-      if (!isGroupChat(message) && (onlyForGroups.isEmpty || onlyForGroups.contains(message.chat.id))) {
+      val chatId = message.chat.id
+      if (!isGroupChat(message) && (onlyForGroups.isEmpty || onlyForGroups.contains(chatId))) {
         false
       } else {
         if (userType == ADMIN_ONLY) {
-          val admins = metaInfoSource.getChatAdministrators(message.chat.id)
-          admins.map(_.id).contains(message.from.id)
+          val admins = metaInfoSource.getChatAdministrators(chatId)
+          admins.map(_.id).contains(message.from.id) && onlyForGroups.contains(chatId)
         } else {
-          true
+          onlyForGroups.contains(chatId)
         }
       }
     }
@@ -53,7 +54,7 @@ package object security {
     }
   }
 
-  class PrivateChatAllowed(onlyForUsers: Seq[Int] = Seq()) extends ChatPermission {
+  private class PrivateChatAllowed(onlyForUsers: Seq[Int] = Seq()) extends ChatPermission {
     override def isAllowed(message: Message, metaInfoSource: MetaInfoSource): Boolean = {
       if (isPrivateChat(message) && onlyForUsers.isEmpty) {
         true

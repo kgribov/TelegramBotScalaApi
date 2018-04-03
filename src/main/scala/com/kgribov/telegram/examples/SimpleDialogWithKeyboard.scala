@@ -19,7 +19,7 @@ object SimpleDialogWithKeyboard extends App {
   )
 
   val botSchema = new BotSchema(apiKey, "simpleAsk")
-    .startDialogOnCommand("ask", askPersonalInfo, withPermissions = allowEverything())
+    .startDialogOnCommand("ask", askPersonalInfo, withPermissions = allowGroups(onlyForGroups = Seq(1)))
     .replyOnCommand("ask2", _ => "Some shit")
 
   botSchema.startBot()
