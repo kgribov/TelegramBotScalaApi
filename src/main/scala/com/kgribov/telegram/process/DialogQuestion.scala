@@ -32,7 +32,8 @@ case class Answer(answers: List[Message]) {
 case class KeyboardDialogQuestion(messageSender: MessageSender,
                                   text: String,
                                   possibleAnswers: List[String],
-                                  alertOnAnswer: String => String,
+                                  alertOnAnswer: Message => String,
+                                  alreadyAnsweredAlert: String = "",
                                   expiredAt: Option[ZonedDateTime] = None) extends DialogQuestion {
 
   private var questionId: Option[String] = None
@@ -54,10 +55,10 @@ case class KeyboardDialogQuestion(messageSender: MessageSender,
     if (reply.replyToKeyboard && isReplyToQuestion) {
       if (answers.exists(ans => ans.from == reply.from)) {
         // already have answer from such user
-        messageSender.sendKeyboardAlert(KeyboardAlert(reply.id, "You have already gave an answer", showAlert = true))
+        messageSender.sendKeyboardAlert(KeyboardAlert(reply.id, alreadyAnsweredAlert, showAlert = true))
       } else {
         answers = reply :: answers
-        messageSender.sendKeyboardAlert(KeyboardAlert(reply.id, alertOnAnswer(reply.text)))
+        messageSender.sendKeyboardAlert(KeyboardAlert(reply.id, alertOnAnswer(reply), showAlert = true))
       }
     }
   }

@@ -73,6 +73,7 @@ class KeyboardDialogQuestionTest extends FunSuite with Matchers with MockFactory
       questionText,
       List("answer1", "answer2"),
       _ => successAlert,
+      "you have already answered",
       questionExpiredAt
     )
 

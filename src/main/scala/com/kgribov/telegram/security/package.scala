@@ -14,7 +14,9 @@ package object security {
     }
   }
 
-  def allowEverything(onlyForUsers: Seq[Int] = Seq(), groupUserType: UserType = ANYONE, onlyForGroups: Seq[Int] = Seq()): ChatPermission = {
+  def allowEverything(onlyForUsers: Seq[Int] = Seq(),
+                      groupUserType: UserType = ANYONE,
+                      onlyForGroups: Seq[Int] = Seq()): ChatPermission = {
     new ChatPermissions(Seq(allowPrivateChats(onlyForUsers), allowGroups(groupUserType, onlyForGroups)))
   }
 
@@ -37,16 +39,20 @@ package object security {
   private class GroupsAllowed(userType: UserType = ANYONE, onlyForGroups: Seq[Int] = Seq()) extends ChatPermission {
     override def isAllowed(message: Message, metaInfoSource: MetaInfoSource): Boolean = {
       val chatId = message.chat.id
-      if (!isGroupChat(message) && (onlyForGroups.isEmpty || onlyForGroups.contains(chatId))) {
+      if (!isGroupChat(message) && isOnlyForGroups(chatId, onlyForGroups)) {
         false
       } else {
         if (userType == ADMIN_ONLY) {
           val admins = metaInfoSource.getChatAdministrators(chatId)
-          admins.map(_.id).contains(message.from.id) && onlyForGroups.contains(chatId)
+          admins.map(_.id).contains(message.from.id) && isOnlyForGroups(chatId, onlyForGroups)
         } else {
-          onlyForGroups.contains(chatId)
+          isOnlyForGroups(chatId, onlyForGroups)
         }
       }
+    }
+
+    private def isOnlyForGroups(chatId: Int, onlyForGroups: Seq[Int]): Boolean = {
+      onlyForGroups.contains(chatId) || onlyForGroups.isEmpty
     }
 
     private def isGroupChat(message: Message): Boolean = {

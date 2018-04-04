@@ -40,15 +40,19 @@ class MessageProcessor(anyMessageProcessors: List[Message => Option[String]],
     val replyMessages = commandsOnly
       .flatMap(message => {
         val command = message.command.get
-        val commandPermissions = commandsPermissions(command)
 
-        if (commandPermissions.isAllowed(message, metaInfoSource)) {
-          simpleCommandsProcessors
-            .get(command)
-            .map(_.apply(message))
-            .flatMap(reply => reply.map(replyText => MessageToSend(message.chat.id, replyText)))
+        if (commandsPermissions.contains(command)) {
+          val commandPermissions = commandsPermissions(command)
+          if (commandPermissions.isAllowed(message, metaInfoSource)) {
+            simpleCommandsProcessors
+              .get(command)
+              .map(_.apply(message))
+              .flatMap(reply => reply.map(replyText => MessageToSend(message.chat.id, replyText)))
+          } else {
+            Seq(MessageToSend(message.chat.id, commandPermissions.permissionsMessage(command, message.from.firstName)))
+          }
         } else {
-          Seq(MessageToSend(message.chat.id, commandPermissions.permissionsMessage(command, message.from.firstName)))
+          Seq()
         }
     })
     messageSender.sendMessages(replyMessages)

@@ -120,7 +120,7 @@ class BotSchema(apiKey: String,
         dialog.dialogTTL,
         messageSender,
         dialog.questions.map(_.toQuestion(messageSender)),
-        dialogWithUser(message.from, dialog.withUserOnly)
+        dialogWithUser(message.from, dialog.personalDialog)
       )
     }
   }

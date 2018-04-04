@@ -9,13 +9,13 @@ object SimpleDialogWithKeyboard extends App {
 
   val askPersonalInfo = Dialog(
     questions = Seq(
-      askQuiz(Quiz("What is your gender", Seq("Male", "Female"))),
-      askQuiz(Quiz("What is your age", Seq("Under 30", "30 and more"))),
+      askSelectQuestion("What is your gender", Seq("Male", "Female")),
+      askSelectQuestion("What is your age", Seq("Under 30", "30 and more")),
       submitAnswers(answers => {
         val allAnswers = answers.allTextAnswers
         s"Thanks for ask, your answers are: [${allAnswers.values.toList}]"
       })
-    ), withUserOnly = false
+    )
   )
 
   val botSchema = new BotSchema(apiKey, "simpleAsk")
