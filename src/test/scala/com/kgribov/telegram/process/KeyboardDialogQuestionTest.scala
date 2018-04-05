@@ -25,7 +25,7 @@ class KeyboardDialogQuestionTest extends FunSuite with Matchers with MockFactory
     }).returning(replyMessage)
 
     (sender.sendKeyboardAlert _).expects(where {
-      (alert: KeyboardAlert) => !alert.showAlert && alert.text == successAlert
+      (alert: KeyboardAlert) => alert.showAlert && alert.text == successAlert
     })
 
     question.askQuestion(chatId)
@@ -46,7 +46,7 @@ class KeyboardDialogQuestionTest extends FunSuite with Matchers with MockFactory
     }).returning(replyMessage)
 
     (sender.sendKeyboardAlert _).expects(where {
-      (alert: KeyboardAlert) => !alert.showAlert && alert.text == successAlert
+      (alert: KeyboardAlert) => alert.showAlert && alert.text == successAlert
     })
 
     (sender.sendKeyboardAlert _).expects(where {
@@ -83,7 +83,7 @@ class KeyboardDialogQuestionTest extends FunSuite with Matchers with MockFactory
     }).returning(replyMessage)
 
     (sender.sendKeyboardAlert _).expects(where {
-      (alert: KeyboardAlert) => !alert.showAlert && alert.text == successAlert
+      (alert: KeyboardAlert) => alert.showAlert && alert.text == successAlert
     })
 
     question.askQuestion(chatId)
