@@ -10,7 +10,7 @@ import scalaj.http.Http
 
 class MessageSender(apiKey: String,
                     retries: Int = 15,
-                    sleepBetweenRetriesInMs: Int = 1000) extends LazyLogging {
+                    sleepBetweenRetriesInMs: Int = 2000) extends LazyLogging {
 
   def sendMessages(messages: List[MessageToSend]): List[Message] = {
     messages.map(send)
@@ -28,7 +28,9 @@ class MessageSender(apiKey: String,
       ("text", message.text)
     ) ++ replyMarkup
 
-    val request = Http(TelegramEndpoints.sendMessageUrl(apiKey)).postForm(params)
+    val request = Http(TelegramEndpoints.sendMessageUrl(apiKey))
+      .timeout(connTimeoutMs = 10000, readTimeoutMs = 10000)
+      .postForm(params)
     val response = requestForResponse(request, retries)
 
     parseMessageResponse(response).toModel
@@ -40,6 +42,8 @@ class MessageSender(apiKey: String,
         ("callback_query_id", keyboardAlert.messageId.toString),
         ("text", keyboardAlert.text),
         ("show_alert", keyboardAlert.showAlert.toString)
-      )).asString
+      ))
+      .timeout(connTimeoutMs = 10000, readTimeoutMs = 10000)
+      .asString
   }
 }

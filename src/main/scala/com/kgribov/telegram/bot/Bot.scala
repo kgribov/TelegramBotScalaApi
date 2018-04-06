@@ -9,7 +9,7 @@ import scala.util.{Failure, Success, Try}
 
 class Bot(messageSource: MessagesSource,
           messageProcessor: MessageProcessor,
-          loadPeriodSec: Int = 1) extends LazyLogging {
+          loadPeriodSec: Int = 2) extends LazyLogging {
 
   def start(stopBot: StopBot = new NeverStopBot): Unit = {
     while (!stopBot()) {
