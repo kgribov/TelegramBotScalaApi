@@ -6,6 +6,7 @@ import com.kgribov.telegram.model.{KeyboardAlert, Message, MessageToSend}
 import com.kgribov.telegram.parser._
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.util.{Failure, Success, Try}
 import scalaj.http.Http
 
 class MessageSender(apiKey: String,
@@ -13,7 +14,7 @@ class MessageSender(apiKey: String,
                     sleepBetweenRetriesInMs: Int = 2000) extends LazyLogging {
 
   def sendMessages(messages: List[MessageToSend]): List[Message] = {
-    messages.map(send)
+    messages.map(sendMessageSafely).flatten
   }
 
   def send(message: MessageToSend): Message = {
@@ -45,5 +46,16 @@ class MessageSender(apiKey: String,
       ))
       .timeout(connTimeoutMs = 10000, readTimeoutMs = 10000)
       .asString
+  }
+
+  private def sendMessageSafely(message: MessageToSend): Option[Message] = {
+    val sendMessage = Try(send(message))
+    sendMessage match {
+      case Success(message) => Some(message)
+      case Failure(ex) => {
+        logger.error(s"Unable to send message: $message", ex)
+        None
+      }
+    }
   }
 }
