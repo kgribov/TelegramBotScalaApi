@@ -12,6 +12,8 @@ class TelegramUpdatesLoader(apiKey: String) extends LazyLogging {
   def loadUpdates(fromOffset: Int): List[Update] = {
     val response = Http(TelegramEndpoints.updatesUrl(apiKey))
       .param("offset", fromOffset.toString)
+      .param("limit", "20")
+      .param("timeout", "8")
       .timeout(connTimeoutMs = 10000, readTimeoutMs = 10000)
       .asString
 
