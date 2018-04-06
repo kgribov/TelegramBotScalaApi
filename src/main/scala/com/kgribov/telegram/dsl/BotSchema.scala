@@ -133,10 +133,12 @@ class BotSchema(apiKey: String,
     }
   }
 
-  def startBot(stopBot: StopBot = new StopBotOnSignal()): Unit = {
+  def startBot(offsetStorePath: String = s"${System.getProperty("user.home")}/telegram_bots",
+               stopBot: StopBot = new StopBotOnSignal()): Unit = {
+
     val messageSource = new MessagesSource(
       new TelegramUpdatesLoader(apiKey).loadUpdates,
-      new FileBasedOffsetStore(botName)
+      new FileBasedOffsetStore(botName, offsetStorePath)
     )
 
     val bot = new Bot(messageSource, createMessageProcessor())
