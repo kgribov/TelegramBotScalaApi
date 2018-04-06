@@ -9,7 +9,7 @@ import scalaj.http.Http
 
 class TelegramUpdatesLoader(apiKey: String) extends LazyLogging {
 
-  def loadUpdates(fromOffset: Int): List[Update] = {
+  def loadUpdates(fromOffset: Long): List[Update] = {
     val response = Http(TelegramEndpoints.updatesUrl(apiKey))
       .param("offset", fromOffset.toString)
       .param("limit", "20")

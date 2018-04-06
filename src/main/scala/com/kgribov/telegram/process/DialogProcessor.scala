@@ -8,7 +8,7 @@ import com.kgribov.telegram.sender.MessageSender
 
 import scala.concurrent.duration.Duration
 
-class DialogProcessor(chatId: Int,
+class DialogProcessor(chatId: Long,
                       dialogTimeout: Duration = Duration(5, TimeUnit.MINUTES),
                       messageSender: MessageSender,
                       questions: Iterable[DialogAnswers => DialogQuestion],

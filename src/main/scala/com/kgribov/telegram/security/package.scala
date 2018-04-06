@@ -14,17 +14,17 @@ package object security {
     }
   }
 
-  def allowEverything(onlyForUsers: Seq[Int] = Seq(),
+  def allowEverything(onlyForUsers: Seq[Long] = Seq(),
                       groupUserType: UserType = ANYONE,
-                      onlyForGroups: Seq[Int] = Seq()): ChatPermission = {
+                      onlyForGroups: Seq[Long] = Seq()): ChatPermission = {
     new ChatPermissions(Seq(allowPrivateChats(onlyForUsers), allowGroups(groupUserType, onlyForGroups)))
   }
 
-  def allowGroups(groupUserType: UserType = ANYONE, onlyForGroups: Seq[Int] = Seq()): ChatPermission = {
+  def allowGroups(groupUserType: UserType = ANYONE, onlyForGroups: Seq[Long] = Seq()): ChatPermission = {
     new GroupsAllowed(groupUserType, onlyForGroups)
   }
 
-  def allowPrivateChats(onlyForUsers: Seq[Int] = Seq()): ChatPermission = {
+  def allowPrivateChats(onlyForUsers: Seq[Long] = Seq()): ChatPermission = {
     new PrivateChatAllowed(onlyForUsers)
   }
 
@@ -36,7 +36,7 @@ package object security {
     }
   }
 
-  private class GroupsAllowed(userType: UserType = ANYONE, onlyForGroups: Seq[Int] = Seq()) extends ChatPermission {
+  private class GroupsAllowed(userType: UserType = ANYONE, onlyForGroups: Seq[Long] = Seq()) extends ChatPermission {
     override def isAllowed(message: Message, metaInfoSource: MetaInfoSource): Boolean = {
       val chatId = message.chat.id
       if (!isGroupChat(message) && isOnlyForGroups(chatId, onlyForGroups)) {
@@ -51,7 +51,7 @@ package object security {
       }
     }
 
-    private def isOnlyForGroups(chatId: Int, onlyForGroups: Seq[Int]): Boolean = {
+    private def isOnlyForGroups(chatId: Long, onlyForGroups: Seq[Long]): Boolean = {
       onlyForGroups.contains(chatId) || onlyForGroups.isEmpty
     }
 
@@ -60,7 +60,7 @@ package object security {
     }
   }
 
-  private class PrivateChatAllowed(onlyForUsers: Seq[Int] = Seq()) extends ChatPermission {
+  private class PrivateChatAllowed(onlyForUsers: Seq[Long] = Seq()) extends ChatPermission {
     override def isAllowed(message: Message, metaInfoSource: MetaInfoSource): Boolean = {
       if (isPrivateChat(message) && onlyForUsers.isEmpty) {
         true

@@ -12,9 +12,9 @@ import scala.util.{Failure, Success, Try}
 class DialogPool(messageSender: MessageSender,
                  clock: Clock = Clock.systemDefaultZone()) extends LazyLogging {
 
-  private val activeDialogs = new mutable.HashMap[Int, DialogProcessor]()
+  private val activeDialogs = new mutable.HashMap[Long, DialogProcessor]()
 
-  def addDialog(chatId: Int, dialog: DialogProcessor): Unit = {
+  def addDialog(chatId: Long, dialog: DialogProcessor): Unit = {
     activeDialogs.put(chatId, dialog)
   }
 

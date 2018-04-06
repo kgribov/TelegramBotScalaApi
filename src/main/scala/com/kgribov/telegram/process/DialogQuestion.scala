@@ -7,7 +7,7 @@ import com.kgribov.telegram.sender.MessageSender
 
 trait DialogQuestion {
 
-  def askQuestion(chatId: Int): String
+  def askQuestion(chatId: Long): String
 
   def isAsked: Boolean
 
@@ -39,7 +39,7 @@ case class KeyboardDialogQuestion(messageSender: MessageSender,
   private var questionId: Option[String] = None
   private var answers = List[Message]()
 
-  override def askQuestion(chatId: Int): String = {
+  override def askQuestion(chatId: Long): String = {
     questionId = Some(messageSender.send(question(chatId)).id)
     questionId.get
   }
@@ -83,7 +83,7 @@ case class KeyboardDialogQuestion(messageSender: MessageSender,
   override def questionText: String = text
 
 
-  private def question(chatId: Int): MessageToSend = {
+  private def question(chatId: Long): MessageToSend = {
     MessageToSend(chatId, text, Some(Keyboard(possibleAnswers)))
   }
 }
@@ -97,7 +97,7 @@ case class TextDialogQuestion(messageSender: MessageSender,
 
   override def isAsked: Boolean = questionId.isDefined
 
-  override def askQuestion(chatId: Int): String = {
+  override def askQuestion(chatId: Long): String = {
     questionId = Some(messageSender.send(question(chatId)).id)
     questionId.get
   }
@@ -116,7 +116,7 @@ case class TextDialogQuestion(messageSender: MessageSender,
 
   override def questionText: String = text
 
-  private def question(chatId: Int): MessageToSend = {
+  private def question(chatId: Long): MessageToSend = {
     MessageToSend(chatId, text)
   }
 }
@@ -125,7 +125,7 @@ case class DummyDialogQuestion(dummyText: String, messageSender: MessageSender) 
 
   private var questionId: Option[String] = None
 
-  override def askQuestion(chatId: Int): String = {
+  override def askQuestion(chatId: Long): String = {
     questionId = Some(messageSender.send(MessageToSend(chatId, dummyText)).id)
     questionId.get
   }

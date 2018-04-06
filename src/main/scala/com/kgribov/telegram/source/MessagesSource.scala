@@ -3,7 +3,7 @@ package com.kgribov.telegram.source
 import com.kgribov.telegram.model.{Message, Update}
 import com.typesafe.scalalogging.LazyLogging
 
-class MessagesSource(loadUpdates: Int => List[Update], offsetStore: OffsetStore) extends LazyLogging {
+class MessagesSource(loadUpdates: Long => List[Update], offsetStore: OffsetStore) extends LazyLogging {
 
   def getNewMessages(): List[Message] = {
     val offset = offsetStore.loadOffset

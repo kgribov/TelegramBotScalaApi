@@ -20,7 +20,7 @@ class MessageSourceTest extends FunSuite with Matchers {
     val source = new MessagesSource(
       loadUpdates(
         Map(
-          0 -> List(update(10), update(0))
+          0L -> List(update(10), update(0))
         )),
       offsetStore)
 
@@ -34,8 +34,8 @@ class MessageSourceTest extends FunSuite with Matchers {
     val source = new MessagesSource(
       loadUpdates(
         Map(
-          0 -> List(update(10), update(0)),
-          100 -> List(update(100))
+          0L -> List(update(10), update(0)),
+          100L -> List(update(100))
         )),
       offsetStore)
 
@@ -44,8 +44,8 @@ class MessageSourceTest extends FunSuite with Matchers {
     messages.map(_.id).max should be ("100")
   }
 
-  private def loadUpdates(returnResults: Map[Int, List[Update]]): (Int) => List[Update] = {
-    (offset: Int) => returnResults.getOrElse(offset, List.empty[Update])
+  private def loadUpdates(returnResults: Map[Long, List[Update]]): (Long) => List[Update] = {
+    (offset: Long) => returnResults.getOrElse(offset, List.empty[Update])
   }
 
   private def update(id: Int): Update = {

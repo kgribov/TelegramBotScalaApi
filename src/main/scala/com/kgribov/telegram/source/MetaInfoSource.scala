@@ -11,18 +11,18 @@ import scalaj.http.Http
 
 class MetaInfoSource(apiKey: String) {
 
-  private val cache: LoadingCache[Int, List[User]] =
+  private val cache: LoadingCache[Long, List[User]] =
     Scaffeine()
       .recordStats()
       .expireAfterWrite(1.hour)
       .maximumSize(500)
-      .build((chatId: Int) => loadAdmins(chatId))
+      .build((chatId: Long) => loadAdmins(chatId))
 
-  def getChatAdministrators(chatId: Int): List[User] = {
+  def getChatAdministrators(chatId: Long): List[User] = {
     cache.get(chatId)
   }
 
-  private def loadAdmins(chatId: Int): List[User] = {
+  private def loadAdmins(chatId: Long): List[User] = {
     val request = Http(TelegramEndpoints.chatAdministratorsUrl(apiKey))
       .postForm(Seq(("chat_id", chatId.toString)))
     val response = requestForResponse(request, 100)

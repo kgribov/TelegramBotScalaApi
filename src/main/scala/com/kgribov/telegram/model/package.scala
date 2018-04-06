@@ -4,18 +4,18 @@ import java.time.ZonedDateTime
 
 package object model {
 
-  case class Update(id: Int, message: Message)
+  case class Update(id: Long, message: Message)
 
-  case class User(id: Int, isBot: Boolean, firstName: String, lastName: Option[String], username: Option[String])
+  case class User(id: Long, isBot: Boolean, firstName: String, lastName: Option[String], username: Option[String])
 
-  case class Chat(id: Int, title: Option[String], description: Option[String], chatType: String)
+  case class Chat(id: Long, title: Option[String], description: Option[String], chatType: String)
 
-  case class MessageToSend(chatId: Int, text: String, replyKeyboard: Option[Keyboard] = None)
+  case class MessageToSend(chatId: Long, text: String, replyKeyboard: Option[Keyboard] = None)
 
-  trait ToSendMessage { def toSend(chatId: Int): MessageToSend }
+  trait ToSendMessage { def toSend(chatId: Long): MessageToSend }
 
   case class QuizMessage(question: String, options: List[String]) extends ToSendMessage {
-    def toSend(chatId: Int): MessageToSend = {
+    def toSend(chatId: Long): MessageToSend = {
       MessageToSend(chatId, question, Some(Keyboard(options)))
     }
   }

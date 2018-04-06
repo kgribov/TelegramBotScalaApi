@@ -7,31 +7,31 @@ import scala.io.Source
 
 trait OffsetStore {
 
-  def loadOffset: Int
+  def loadOffset: Long
 
-  def store(offset: Int)
+  def store(offset: Long)
 }
 
-class InMemoryOffsetStore(startOffset: Int = 0) extends OffsetStore  {
+class InMemoryOffsetStore(startOffset: Long = 0) extends OffsetStore  {
 
-  private var currentOffset = startOffset
+  private var currentOffset: Long = startOffset
 
-  override def loadOffset: Int = currentOffset
+  override def loadOffset: Long = currentOffset
 
-  override def store(offset: Int): Unit = {
+  override def store(offset: Long): Unit = {
     currentOffset = offset
   }
 
-  def getCurrentOffset: Int = currentOffset
+  def getCurrentOffset: Long = currentOffset
 }
 
 class FileBasedOffsetStore(botName: String, storePath: String = s"${System.getProperty("user.home")}/telegram_bots") extends OffsetStore {
 
   private val offsetFilePath = s"$storePath/$botName/offset"
 
-  private var currentOffset: Option[Int] = None
+  private var currentOffset: Option[Long] = None
 
-  override def loadOffset: Int = {
+  override def loadOffset: Long = {
     if (currentOffset.isEmpty) {
       val loadedOffset = loadFromFile
       currentOffset = Some(loadedOffset)
@@ -39,12 +39,12 @@ class FileBasedOffsetStore(botName: String, storePath: String = s"${System.getPr
     currentOffset.get
   }
 
-  override def store(offset: Int): Unit = {
+  override def store(offset: Long): Unit = {
     currentOffset = Some(offset)
     storeToFile(offset)
   }
 
-  private def storeToFile(offset: Int): Unit = {
+  private def storeToFile(offset: Long): Unit = {
     val directory = new File(offsetFilePath).getParentFile
     if (!directory.exists()) {
       directory.mkdirs()

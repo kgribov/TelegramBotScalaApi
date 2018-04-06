@@ -7,7 +7,7 @@ import com.kgribov.telegram.model._
 
 package object json {
 
-  case class UpdateJson(@JsonProperty(required = true, value = "update_id") id: Int,
+  case class UpdateJson(@JsonProperty(required = true, value = "update_id") id: Long,
                         @JsonProperty(value = "message") message: Option[MessageJson],
                         @JsonProperty(value = "callback_query") callbackQuery: Option[CallbackQueryJson]) {
 
@@ -19,7 +19,7 @@ package object json {
     }
   }
 
-  case class UserJson(@JsonProperty(required = true, value = "id") id: Int,
+  case class UserJson(@JsonProperty(required = true, value = "id") id: Long,
                       @JsonProperty(required = true, value = "is_bot") isBot: Boolean,
                       @JsonProperty(required = true, value = "first_name") firstName: String,
                       @JsonProperty(value = "last_name") lastName: Option[String],
@@ -37,7 +37,7 @@ package object json {
     }
   }
 
-  case class ChatJson(@JsonProperty(required = true, value = "id") id: Int,
+  case class ChatJson(@JsonProperty(required = true, value = "id") id: Long,
                       @JsonProperty(value = "title") title: Option[String],
                       @JsonProperty(value = "description") description: Option[String],
                       @JsonProperty(required = true, value = "type") chatType: String) {
@@ -57,9 +57,9 @@ package object json {
     }
   }
 
-  case class MessageJson(@JsonProperty(required = true, value = "message_id") id: Int,
+  case class MessageJson(@JsonProperty(required = true, value = "message_id") id: Long,
                          @JsonProperty(required = true, value = "from") from: UserJson,
-                         @JsonProperty(required = true, value = "date") date: Int,
+                         @JsonProperty(required = true, value = "date") date: Long,
                          @JsonProperty(value = "reply_to_message") replyTo: Option[MessageJson],
                          @JsonProperty(required = true, value = "chat") chat: ChatJson,
                          @JsonProperty(value = "text") rawText: Option[String]) {
