@@ -57,7 +57,7 @@ class FileBasedOffsetStore(botName: String, storePath: String = s"${System.getPr
   private def loadFromFile: Int = {
     if (Files.exists(Paths.get(offsetFilePath))) {
       val source = Source.fromFile(offsetFilePath)
-      val content = source.mkString
+      val content = source.getLines().next()
       if (content.isEmpty) {
         0
       } else {
