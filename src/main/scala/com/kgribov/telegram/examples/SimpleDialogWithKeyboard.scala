@@ -19,6 +19,7 @@ object SimpleDialogWithKeyboard extends App {
   )
 
   val botSchema = new BotSchema(apiKey, "simpleAsk")
+    .startDialogOnCommand("ask", askPersonalInfo)
     .replyOnCommand("id", message => s"userId: ${message.from.id} chatId: ${message.chat.id}")
 
   botSchema.startBot()
