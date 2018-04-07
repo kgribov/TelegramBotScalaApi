@@ -13,7 +13,7 @@ class MessagesSource(loadUpdates: Long => List[Update], offsetStore: OffsetStore
     logger.debug(s"Load next messages: $updates")
 
     val nextOffset = if (updates.isEmpty) {
-      offset
+      offset + 1
     } else {
       updates.map(_.id).max + 1
     }

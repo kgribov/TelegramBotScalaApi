@@ -5,6 +5,7 @@ import com.kgribov.telegram.model.Update
 import com.kgribov.telegram.parser._
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.util.Try
 import scalaj.http.Http
 
 class TelegramUpdatesLoader(apiKey: String) extends LazyLogging {
@@ -24,7 +25,12 @@ class TelegramUpdatesLoader(apiKey: String) extends LazyLogging {
     val responseBody = response.body
     logger.debug(s"Get next response: [$responseBody]")
 
-    parseUpdates(responseBody).map(_.toModel)
+    val tryToLoad = Try(parseUpdates(responseBody).map(_.toModel))
+    if (tryToLoad.isSuccess) {
+      tryToLoad.get
+    } else {
+      List.empty
+    }
   }
 }
 
