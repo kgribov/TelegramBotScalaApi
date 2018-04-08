@@ -25,7 +25,7 @@ class InMemoryOffsetStore(startOffset: Long = 0) extends OffsetStore  {
   def getCurrentOffset: Long = currentOffset
 }
 
-class FileBasedOffsetStore(botName: String, storePath: String = s"${System.getProperty("user.home")}/telegram_bots") extends OffsetStore {
+class FileBasedOffsetStore(botName: String, storePath: String) extends OffsetStore {
 
   private val offsetFilePath = s"$storePath/$botName/offset"
 
@@ -57,11 +57,11 @@ class FileBasedOffsetStore(botName: String, storePath: String = s"${System.getPr
   private def loadFromFile: Int = {
     if (Files.exists(Paths.get(offsetFilePath))) {
       val source = Source.fromFile(offsetFilePath)
-      val content = source.getLines().next()
-      if (content.isEmpty) {
-        0
+      val content = source.getLines()
+      if (content.hasNext) {
+        content.next().toInt
       } else {
-        content.toInt
+        0
       }
     } else {
       0

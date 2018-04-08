@@ -4,7 +4,7 @@ import java.time.ZonedDateTime
 
 package object model {
 
-  case class Update(id: Long, message: Message)
+  case class Update(id: Long, message: Option[Message])
 
   case class User(id: Long, isBot: Boolean, firstName: String, lastName: Option[String], username: Option[String])
 

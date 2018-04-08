@@ -32,7 +32,7 @@ class MessageSender(apiKey: String,
     val request = Http(TelegramEndpoints.sendMessageUrl(apiKey))
       .timeout(connTimeoutMs = 10000, readTimeoutMs = 10000)
       .postForm(params)
-    val response = requestForResponse(request, retries)
+    val response = requestForTextResponse(request, retries)
 
     parseMessageResponse(response).toModel
   }

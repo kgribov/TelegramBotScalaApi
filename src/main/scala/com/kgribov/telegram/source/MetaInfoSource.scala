@@ -25,7 +25,7 @@ class MetaInfoSource(apiKey: String) {
   private def loadAdmins(chatId: Long): List[User] = {
     val request = Http(TelegramEndpoints.chatAdministratorsUrl(apiKey))
       .postForm(Seq(("chat_id", chatId.toString)))
-    val response = requestForResponse(request, 100)
+    val response = requestForTextResponse(request, 100)
     parseAdminsResponse(response).map(_.toModel)
   }
 }

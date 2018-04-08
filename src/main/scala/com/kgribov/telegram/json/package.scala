@@ -15,7 +15,7 @@ package object json {
       val messageModel = message.map(_.toModel)
       val callbackModel = callbackQuery.map(_.toMessageModel)
 
-      Update(id, messageModel.getOrElse(callbackModel.get))
+      Update(id, messageModel.orElse(callbackModel))
     }
   }
 

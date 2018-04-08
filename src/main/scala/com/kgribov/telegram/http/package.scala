@@ -3,14 +3,14 @@ package com.kgribov.telegram
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.util.{Failure, Success, Try}
-import scalaj.http.HttpRequest
+import scalaj.http.{HttpRequest, HttpResponse}
 
 package object http extends LazyLogging {
 
-  def requestForResponse(request: HttpRequest, retries: Int, tryCount: Int = 0): String = {
-    val response = Try(request.asString.body)
-    response match {
-      case Success(body) => body
+  def requestForResponse(request: HttpRequest, retries: Int, tryCount: Int = 0): HttpResponse[String] = {
+    val responseTry = Try(request.asString)
+    responseTry match {
+      case Success(response) => response
       case Failure(ex) => {
         logger.error(s"Unable to send request $request. Try count: $tryCount", ex)
         if (tryCount == retries) {
@@ -20,6 +20,10 @@ package object http extends LazyLogging {
         }
       }
     }
+  }
+
+  def requestForTextResponse(request: HttpRequest, retries: Int, tryCount: Int = 0): String = {
+    requestForResponse(request, retries, tryCount).body
   }
 
   class UnableToSendRequest(message: String, exception: Throwable) extends Exception(message, exception)

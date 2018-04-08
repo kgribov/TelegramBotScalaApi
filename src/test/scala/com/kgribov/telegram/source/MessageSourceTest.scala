@@ -15,7 +15,7 @@ class MessageSourceTest extends FunSuite with Matchers {
     messages should have size 0
   }
 
-  test("message source should commit offset to offsetStore") {
+  test("message source should commit new offset to offsetStore") {
     val offsetStore = new InMemoryOffsetStore
     val source = new MessagesSource(
       loadUpdates(
@@ -42,6 +42,17 @@ class MessageSourceTest extends FunSuite with Matchers {
     val messages = source.getNewMessages()
 
     messages.map(_.id).max should be ("100")
+    offsetStore.getCurrentOffset should be (101)
+  }
+
+  test("message source should take next offset if load was failed") {
+    val offsetStore = new InMemoryOffsetStore
+    val source = new MessagesSource(_ => throw new RuntimeException("Unable to load"), offsetStore)
+
+    val messages = source.getNewMessages()
+
+    messages.size should be (0)
+    offsetStore.getCurrentOffset should be (1)
   }
 
   private def loadUpdates(returnResults: Map[Long, List[Update]]): (Long) => List[Update] = {
@@ -49,6 +60,6 @@ class MessageSourceTest extends FunSuite with Matchers {
   }
 
   private def update(id: Int): Update = {
-    Update(id, Message(id.toString, null, None, None, false, ZonedDateTime.now(), null, "hello"))
+    Update(id, Some(Message(id.toString, null, None, None, false, ZonedDateTime.now(), null, "hello")))
   }
 }
