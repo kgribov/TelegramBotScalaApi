@@ -5,7 +5,9 @@
 ![bot logo](http://www.chatterbotcollection.com/images/telegram-bot_1436220825.png)
 ## Overview
 Would like to write powerfull telegram bots using scala? This project is made for you.
+
 Scala API is currently available for **Scala 2.12**.
+
 If you don't have your own project where to add this API and you want to start using API as fast as possible, I highly recommend for you to look at this project: [TelegramBot](https://github.com/kgribov/TelegramBot).
 It was also created by me for next purposes:
 * You don't need to generate new project, it is already done, just clone repository with set up classes
