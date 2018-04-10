@@ -106,7 +106,7 @@ If you want to allow command in group chats and for admin of chat only:
 replyOnCommand("groupAdminAction", _ => "ADMIN IS HERE", withPermissions = allowGroups(ADMIN_ONLY))
 ```
 
-**By default all commands allow everywhere.**
+**By default all commands are allowed everywhere.**
 
 
 Example: [CommandsPermissionsExample](https://github.com/kgribov/TelegramBotScalaApi/blob/master/src/main/scala/com/kgribov/telegram/examples/CommandsPermissionsExample.scala)
@@ -184,7 +184,7 @@ If **questionTTL** is None, bot will not move to next question till get answer f
 * **submitAlert** - a function *answer* => *alert message*, what bot should print after user answer.
 * **alreadyAnsweredAlert** - an alert message, when user has already gave answer to the question.
 
-But what if you would like to reply something to users, after some users answers? For such purposes you could use `submitAnswers` question:
+But what if you would like to reply something to users, after some user's answers? For such purposes you could use `submitAnswers` question:
 ```
 submitAnswers(answers => {
   val allAnswers = answers.allTextAnswers
