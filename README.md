@@ -68,9 +68,9 @@ To process commands use methods: `onCommand` to collect some info, and `replyOnC
 `onCommand` usage example:
 ```
 onCommand("add", message => {
-        val inputNumber = Try(message.text.toInt).getOrElse(0)
-        counter.addAndGet(inputNumber)
-      })
+    val inputNumber = Try(message.text.toInt).getOrElse(0)
+    counter.addAndGet(inputNumber)
+})
 ```
 This code will add a number from the message `/add <number>` to counter
 
@@ -86,7 +86,7 @@ Example: [OnCommandExample](https://github.com/kgribov/TelegramBotScalaApi/blob/
 
 Sometimes you don't want to allow use your bot in group chats or only admin of the group could perform specific command.
 
-You could use command's permissions to achive this. Don't forget to import `security` package:
+You could use command's permissions to achieve this. Don't forget to import `security` package:
 ```
 import com.kgribov.telegram.security._
 ```
@@ -108,8 +108,98 @@ replyOnCommand("groupAdminAction", _ => "ADMIN IS HERE", withPermissions = allow
 
 **By default all commands allow everywhere.**
 
+
 Example: [CommandsPermissionsExample](https://github.com/kgribov/TelegramBotScalaApi/blob/master/src/main/scala/com/kgribov/telegram/examples/CommandsPermissionsExample.scala)
 
 ### Creating dialogs
 
-### Creating quizes
+Processing messages and commands is not a big problem, lots of frameworks can do it. Our scala API provides cool feature, which help you to build a really powerful bots.
+It is creating **dialogs**. Dialog is a sequence of bot's questions to users. With dialogs you could create registration forms, quizzes, games and etc.
+
+You could assign creating dialog on some command with method `startDialogOnCommand`:
+```
+startDialogOnCommand("ask", askPersonalInfo, withPermissions = allowPrivateChats())
+```
+
+Okey, what is `askPersonalInfo`? It is an instance of `Dialog` class:
+```
+val askPersonalInfo = Dialog(
+  questions = Seq(
+
+    askSelectQuestion(
+      "What is your gender",
+      Seq("Male", "Female"),
+      submitAlert = _ => "I like your answer!"
+    ),
+
+    askSelectQuestion(
+      "What is your age (question is actual for 5 seconds)",
+      Seq("Under 30", "30 and more"),
+      questionTTL = Some(5.seconds)
+    ),
+
+    askQuestion("What is your name?"),
+
+    submitAnswers(answers => {
+      val allAnswers = answers.allTextAnswers
+      s"Thanks for ask, your answers are: [${allAnswers.values.mkString(",")}]"
+    })
+  ),
+
+  personalDialog = true,
+
+  dialogTTL = 1.minute
+)
+```
+Dialog have three params:
+* `questions` - a sequence of questions, that you want to ask users
+* `personalDialog` - a boolean flag, if true then dialog will accept only replies from user who typed command to start dialog, if false from anyone.
+This helpful when your bot is using in group chats and you want to ignore other user's replies. By default this param is **true** and you could ommit it.
+* `dialogTTL` - duration while your dialog is active. After it answers will be not accepted. By default this param is **5 minutes** and you could ommit it.
+
+There are two types of questions:
+
+**Text questions:**
+
+You could ask simple text question using method `askQuestion`:
+```
+askQuestion("What is your name?")
+```
+
+**Select questions:**
+
+If you have question with possible answers, you could use `askSelectQuestion`:
+```
+askSelectQuestion(
+  "What is your age (question is actual for 5 seconds)",
+  Seq("Under 30", "30 and more"),
+  questionTTL = Some(5.seconds)
+)
+```
+First param is a question text, second is possible answers.
+
+Also, you could specify some additional (not required) params:
+* **questionTTL** - duration while question is active, after this time bot will move to next question (no answers will be accepted for current question).
+If **questionTTL** is None, bot will not move to next question till get answer from user.
+* **submitAlert** - a function *answer* => *alert message*, what bot should print after user answer.
+* **alreadyAnsweredAlert** - an alert message, when user has already gave answer to the question.
+
+But what if you would like to reply something to users, after some users answers? For such purposes you could use `submitAnswers` question:
+```
+submitAnswers(answers => {
+  val allAnswers = answers.allTextAnswers
+  s"Thanks for ask, your answers are: [${allAnswers.values.mkString(",")}]"
+})
+```
+You could discover all answers from users using class `DialogAnswers` and return some message to users.
+
+
+If you want to build dynamic dialogs, when next questions depends on previous answers you should use methods: `askQuestionOnAnswers` and `askSelectQuestionOnAnswers`.
+Instead of text question, they take function *answers* => *text question*.
+
+Example: [DialogExample](https://github.com/kgribov/TelegramBotScalaApi/blob/master/src/main/scala/com/kgribov/telegram/examples/DialogExample.scala)
+
+### Creating quizzes
+TODO
+
+Example: [QuizExample](https://github.com/kgribov/TelegramBotScalaApi/blob/master/src/main/scala/com/kgribov/telegram/examples/QuizExample.scala)

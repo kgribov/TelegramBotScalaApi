@@ -9,10 +9,10 @@ package object dsl {
 
   val submitSuccessMes = (_: String) => "Answer submitted"
 
-  def askSelectQuestionOnAnswer(question: DialogAnswers => SelectQuestion,
-                                submitAlert: String => String = submitSuccessMes,
-                                alreadyAnsweredAlert: String = "You have already answered to this question",
-                                questionTTL: Option[Duration] = None): AskSelectQuestion = {
+  def askSelectQuestionOnAnswers(question: DialogAnswers => SelectQuestion,
+                                 submitAlert: String => String = submitSuccessMes,
+                                 alreadyAnsweredAlert: String = "You have already answered to this question",
+                                 questionTTL: Option[Duration] = None): AskSelectQuestion = {
     AskSelectQuestion(question, submitAlert, alreadyAnsweredAlert, questionTTL)
   }
 
@@ -28,7 +28,7 @@ package object dsl {
     AskTextQuestion(_ => questionText)
   }
 
-  def askQuestion(question: DialogAnswers => String): AskQuestion = {
+  def askQuestionOnAnswers(question: DialogAnswers => String): AskQuestion = {
     AskTextQuestion(question)
   }
 

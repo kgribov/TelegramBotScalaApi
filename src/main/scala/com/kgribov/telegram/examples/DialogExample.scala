@@ -1,16 +1,16 @@
 package com.kgribov.telegram.examples
 
 import com.kgribov.telegram.dsl._
+import com.kgribov.telegram.security._
 import scala.concurrent.duration._
 
-object SimpleDialogExample extends App {
+object DialogExample extends App {
 
   val apiKey = ""
 
   def botSchema(apiKey: String): BotSchema = {
     val askPersonalInfo = Dialog(
       questions = Seq(
-
         askSelectQuestion(
           "What is your gender",
           Seq("Male", "Female"),
@@ -29,11 +29,13 @@ object SimpleDialogExample extends App {
           val allAnswers = answers.allTextAnswers
           s"Thanks for ask, your answers are: [${allAnswers.values.mkString(",")}]"
         })
-      )
+      ),
+      personalDialog = true,
+      dialogTTL = 1.minute
     )
 
     new BotSchema(apiKey, "simpleAsk")
-      .startDialogOnCommand("ask", askPersonalInfo)
+      .startDialogOnCommand("ask", askPersonalInfo, withPermissions = allowPrivateChats())
   }
 
   botSchema(apiKey).startBot()
