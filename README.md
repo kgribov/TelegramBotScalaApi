@@ -180,7 +180,7 @@ First param is a question text, second is possible answers.
 
 Also, you could specify some additional (not required) params:
 * **questionTTL** - duration while question is active, after this time bot will move to next question (no answers will be accepted for current question).
-If **questionTTL** is None, bot will not move to next question till get answer from user.
+If **questionTTL** is None, bot will not move to next question till get answer from user. Default is **None**.
 * **submitAlert** - a function *answer* => *alert message*, what bot should print after user answer.
 * **alreadyAnsweredAlert** - an alert message, when user has already gave answer to the question.
 
