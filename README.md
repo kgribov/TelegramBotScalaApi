@@ -72,17 +72,43 @@ onCommand("add", message => {
         counter.addAndGet(inputNumber)
       })
 ```
-This code will add number from message `/add <number>` to counter
+This code will add a number from the message `/add <number>` to counter
 
-If you want to reply something to user on command, user merhod `replyOnCommand`:
+If you want to reply something to user on command, use merhod `replyOnCommand`:
 ```
 replyOnCommand("random", _ => s"Random number: ${Random.nextInt(100)}")
 ```
 So, if you type `/random` to bot, it will print random number.
 
-Example [OnCommandExample](https://github.com/kgribov/TelegramBotScalaApi/blob/master/src/main/scala/com/kgribov/telegram/examples/OnCommandExample.scala)
+Example: [OnCommandExample](https://github.com/kgribov/TelegramBotScalaApi/blob/master/src/main/scala/com/kgribov/telegram/examples/OnCommandExample.scala)
 
-### Commands permissions
+### Command's permissions
+
+Sometimes you don't want to allow use your bot in group chats or only admin of the group could perform specific command.
+
+You could use command's permissions to achive this. Don't forget to import `security` package:
+```
+import com.kgribov.telegram.security._
+```
+
+If you want to allow only group chats, just pass `withPermissions = allowGroups()` into command method,
+to allow only private chats `withPermissions = allowPrivateChats()`
+
+Also you could specify group's or user's ids, which will be only allowed, f.e:
+```
+replyOnCommand("privateAction", _ => "Hi man!", withPermissions = allowPrivateChats(<my_user_id>))
+```
+
+This `privateAction` will be allowed in chat with you only (good way to test your bot before _production_)
+
+If you want to allow command in group chats and for admin of chat only:
+```
+replyOnCommand("groupAdminAction", _ => "ADMIN IS HERE", withPermissions = allowGroups(ADMIN_ONLY))
+```
+
+**By default all commands allow everywhere.**
+
+Example: [CommandsPermissionsExample](https://github.com/kgribov/TelegramBotScalaApi/blob/master/src/main/scala/com/kgribov/telegram/examples/CommandsPermissionsExample.scala)
 
 ### Creating dialogs
 
