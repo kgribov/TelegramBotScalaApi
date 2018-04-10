@@ -41,7 +41,49 @@ This bot will return random number, just print `/random` in private chat with yo
 ## API features
 This API contains lots of features, which will help you to create any kind of bot. You could discover examples of API usage in example package: [Examples](https://github.com/kgribov/TelegramBotScalaApi/tree/master/src/main/scala/com/kgribov/telegram/examples)
 ### Processing messages
+
+To catch any message and make some processing use methods: `onMessage` and `replyOnMessage`
+
+First method is helpful, when you want to collect some info, f.e. increment counter:
+```
+onMessage(message => messagesCounter.addAndGet(1))
+```
+
+If you wanna to return some message to user, use method `replyOnMessage`.
+You could also filter your messages, if you don't want to process messages with commands f.e.
+In this example on message `count` we will return number of messages.
+```
+replyOnMessage(
+    filter = message => message.text.equals("count"),
+    reply = message => s"Your number of messages is ${messagesCounter.get()}"
+)
+```
+
+Example: [ProcessAnyMessage](https://github.com/kgribov/TelegramBotScalaApi/blob/master/src/main/scala/com/kgribov/telegram/examples/ProcessAnyMessage.scala)
+
 ### Processing commands
+
+To process commands use methods: `onCommand` to collect some info, and `replyOnCommand` to reply something to user.
+
+`onCommand` usage example:
+```
+onCommand("add", message => {
+        val inputNumber = Try(message.text.toInt).getOrElse(0)
+        counter.addAndGet(inputNumber)
+      })
+```
+This code will add number from message `/add <number>` to counter
+
+If you want to reply something to user on command, user merhod `replyOnCommand`:
+```
+replyOnCommand("random", _ => s"Random number: ${Random.nextInt(100)}")
+```
+So, if you type `/random` to bot, it will print random number.
+
+Example [OnCommandExample](https://github.com/kgribov/TelegramBotScalaApi/blob/master/src/main/scala/com/kgribov/telegram/examples/OnCommandExample.scala)
+
 ### Commands permissions
+
 ### Creating dialogs
+
 ### Creating quizes
