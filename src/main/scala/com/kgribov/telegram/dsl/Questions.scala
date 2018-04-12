@@ -54,30 +54,3 @@ class CollectAnswers(submitText: DialogAnswers => String) extends AskQuestion {
       DummyDialogQuestion(submitText(currentAnswers), messageSender)
     }
 }
-
-class AskQuiz(question: String,
-                   selectAnswer: Seq[String],
-                   quizAnswer: String,
-                   collectRightAnswers: Message => Unit,
-                   collectMistakes: Message => Unit,
-                   rightAnswerAlert: => String,
-                   wrongAnswerAlert: => String,
-                   alreadyAnsweredAlert: => String,
-                   quizTTL: Option[Duration] = None) extends AskQuestion {
-
-  private def expiredAt: Option[ZonedDateTime] = quizTTL.map(duration => ZonedDateTime.now().plusNanos(duration.toNanos))
-
-  override def toQuestion(messageSender: MessageSender): (DialogAnswers) => DialogQuestion = {
-    def submitAlert(answer: Message): String = {
-      if (answer.text == quizAnswer) {
-        collectRightAnswers(answer)
-        rightAnswerAlert
-      } else {
-        collectMistakes(answer)
-        wrongAnswerAlert
-      }
-    }
-    (_: DialogAnswers) =>
-      KeyboardDialogQuestion(messageSender, question, selectAnswer.toList, submitAlert, alreadyAnsweredAlert, expiredAt)
-  }
-}

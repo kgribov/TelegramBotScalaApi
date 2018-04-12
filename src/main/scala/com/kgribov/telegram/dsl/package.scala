@@ -1,9 +1,9 @@
 package com.kgribov.telegram
 
-import com.kgribov.telegram.model.Message
-import com.kgribov.telegram.process.DialogAnswers
+import java.util.concurrent.TimeUnit
+import scala.concurrent.duration._
 
-import scala.concurrent.duration.Duration
+import com.kgribov.telegram.process.DialogAnswers
 
 package object dsl {
 
@@ -33,23 +33,16 @@ package object dsl {
   }
 
   def askQuiz(question: String,
-              selectAnswer: Seq[String],
-              quizAnswer: String,
-              collectRightAnswers: Message => Unit = message => (),
-              collectMistakes: Message => Unit = message => (),
-              rightAnswerAlert: => String = "Yeah! You are right!",
-              wrongAnswerAlert: => String = "Sorry, it is wrong answer",
-              alreadyAnsweredAlert: => String = "You have already answered to this quiz",
-              quizTTL: Option[Duration] = None): AskQuiz = {
+              selectAnswer: QuizAllAnswers,
+              alertsMessages: AlertsMessages = FixedAlertsMessages(),
+              collectAnswers: AnswersCollector = AnswersCollector(),
+              quizTTL: Duration = 0.seconds): AskQuiz = {
+
     new AskQuiz(
       question,
       selectAnswer,
-      quizAnswer,
-      collectRightAnswers,
-      collectMistakes,
-      rightAnswerAlert,
-      wrongAnswerAlert,
-      alreadyAnsweredAlert,
+      alertsMessages,
+      collectAnswers,
       quizTTL
     )
   }
