@@ -1,6 +1,5 @@
 package com.kgribov.telegram
 
-import java.util.concurrent.TimeUnit
 import scala.concurrent.duration._
 
 import com.kgribov.telegram.process.DialogAnswers

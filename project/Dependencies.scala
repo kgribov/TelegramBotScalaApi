@@ -15,6 +15,8 @@ object Dependencies {
 
   lazy val cache = "com.github.blemale" %% "scaffeine" % "2.5.0" % "compile"
 
+  lazy val cron = "com.github.alonsodomin.cron4s" %% "cron4s-core" % "0.4.5"
+
   lazy val testing = "org.scalatest" %% "scalatest" % "3.0.4" % Test
 
   lazy val mock = "org.scalamock" %% "scalamock" % "4.1.0" % Test
@@ -26,6 +28,7 @@ object Dependencies {
     jacksonCore,
     jacksonScalaModule,
     cache,
+    cron,
     testing,
     mock
   )

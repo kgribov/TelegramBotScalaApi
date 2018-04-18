@@ -4,6 +4,8 @@ import java.time.ZonedDateTime
 
 package object model {
 
+  val BOT_USER = User(0, isBot = true, "current_bot", None, None)
+
   case class Update(id: Long, message: Option[Message])
 
   case class User(id: Long, isBot: Boolean, firstName: String, lastName: Option[String], username: Option[String])

@@ -22,7 +22,7 @@ class Bot(messageSource: MessagesSource,
   }
 
   private def loadNewMessages: List[Message] = {
-    val newMessages = Try(messageSource.getNewMessages())
+    val newMessages = Try(messageSource.loadNewMessages())
 
     newMessages match {
       case Success(listOfMessages) => {

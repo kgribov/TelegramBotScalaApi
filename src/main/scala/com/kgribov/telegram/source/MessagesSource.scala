@@ -5,9 +5,11 @@ import com.typesafe.scalalogging.LazyLogging
 
 import scala.util.{Failure, Success, Try}
 
-class MessagesSource(loadUpdates: Long => List[Update], offsetStore: OffsetStore) extends LazyLogging {
+class MessagesSource(loadUpdates: Long => List[Update],
+                     offsetStore: OffsetStore,
+                     internMessagesSources: Seq[() => List[Message]] = Seq()) extends LazyLogging {
 
-  def getNewMessages(): List[Message] = {
+  def loadNewMessages(): List[Message] = {
     val offset = offsetStore.loadOffset
 
     val tryUpdates = Try(loadUpdates(offset))
@@ -26,7 +28,7 @@ class MessagesSource(loadUpdates: Long => List[Update], offsetStore: OffsetStore
         val messages = updatesToMessages(updates)
         logger.info(s"Load ${messages.size} new messages")
 
-        messages
+        messages ++ loadInternMessages()
       }
       case Failure(ex) => {
         val nextOffset = offset + 1
@@ -34,6 +36,16 @@ class MessagesSource(loadUpdates: Long => List[Update], offsetStore: OffsetStore
         offsetStore.store(nextOffset)
         List.empty[Message]
       }
+    }
+  }
+
+  private def loadInternMessages(): List[Message] = {
+    val tryMessages = Try(internMessagesSources.flatMap(_.apply()).toList)
+    tryMessages match {
+      case Success(messages) => messages
+      case Failure(ex) =>
+        logger.error("Unable to get intern messages", ex)
+        List.empty[Message]
     }
   }
 

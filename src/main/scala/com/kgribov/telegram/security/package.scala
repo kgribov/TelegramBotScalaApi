@@ -14,6 +14,11 @@ package object security {
     }
   }
 
+  def allowBotOnly(): ChatPermission = {
+    val botId = model.BOT_USER.id
+    new ChatPermissions(Seq(allowPrivateChats(Seq(botId)), allowGroups(onlyForGroups = Seq(botId))))
+  }
+
   def allowEverything(onlyForUsers: Seq[Long] = Seq(),
                       groupUserType: UserType = ANYONE,
                       onlyForGroups: Seq[Long] = Seq()): ChatPermission = {

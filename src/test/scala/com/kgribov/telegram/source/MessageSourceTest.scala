@@ -10,7 +10,7 @@ class MessageSourceTest extends FunSuite with Matchers {
   test("message source should return 0 messages if no updates available") {
     val source = new MessagesSource(loadUpdates(Map()), new InMemoryOffsetStore)
 
-    val messages = source.getNewMessages()
+    val messages = source.loadNewMessages()
 
     messages should have size 0
   }
@@ -24,7 +24,7 @@ class MessageSourceTest extends FunSuite with Matchers {
         )),
       offsetStore)
 
-    val messages = source.getNewMessages()
+    val messages = source.loadNewMessages()
 
     offsetStore.getCurrentOffset should be (11)
   }
@@ -39,7 +39,7 @@ class MessageSourceTest extends FunSuite with Matchers {
         )),
       offsetStore)
 
-    val messages = source.getNewMessages()
+    val messages = source.loadNewMessages()
 
     messages.map(_.id).max should be ("100")
     offsetStore.getCurrentOffset should be (101)
@@ -49,7 +49,7 @@ class MessageSourceTest extends FunSuite with Matchers {
     val offsetStore = new InMemoryOffsetStore
     val source = new MessagesSource(_ => throw new RuntimeException("Unable to load"), offsetStore)
 
-    val messages = source.getNewMessages()
+    val messages = source.loadNewMessages()
 
     messages.size should be (0)
     offsetStore.getCurrentOffset should be (1)
