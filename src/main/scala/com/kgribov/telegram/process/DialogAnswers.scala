@@ -19,12 +19,16 @@ class DialogAnswers(answers: List[(String, Answer)] = List()) {
     if (answers.isEmpty) {
       throw new Exception("You should ask something before read answers")
     }
-    answers.head._2.simpleAnswer.text
+    answers.head._2.firstAnswer.text
   }
 
   def allTextAnswers: Map[String, String] = answers.groupBy(_._1).map(answers =>
-    (answers._1, answers._2.head._2.simpleAnswer.text)
+    (answers._1, answers._2.head._2.firstAnswer.text)
   )
+
+  def allAnswersFromOneUser: Map[String, String] = {
+    answers.map(answer => (answer._1, answer._2.firstAnswer.text)).toMap
+  }
 
   def lastAnswersFromUsers: List[(User, String)] =
     answers

@@ -24,7 +24,7 @@ case class Answer(answers: List[Message]) {
 
   def isSimple: Boolean = answers.size == 1
 
-  def simpleAnswer: Message = answers.head
+  def firstAnswer: Message = answers.head
 
   def allAnswers: List[Message] = answers
 }
