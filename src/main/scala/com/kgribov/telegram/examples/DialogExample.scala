@@ -1,20 +1,20 @@
 package com.kgribov.telegram.examples
 
-import com.kgribov.telegram.dsl._
-import com.kgribov.telegram.security._
+import com.kgribov.telegram.bot.schema._
+
 import scala.concurrent.duration._
 
 object DialogExample extends App {
 
   val apiKey = ""
 
-  def botSchema(apiKey: String): BotSchema = {
-    val askPersonalInfo = Dialog(
+  def botSchema(): BotSchema = {
+    val askPersonalInfo = DialogSchema(
       questions = Seq(
         askSelectQuestion(
-          "What is your gender",
+          question = "What is your gender",
           Seq("Male", "Female"),
-          submitAlert = _ => "I like your answer!"
+          submitAlert = _ => Some("I like your answer!")
         ),
 
         askSelectQuestion(
@@ -23,20 +23,23 @@ object DialogExample extends App {
           questionTTL = Some(5.seconds)
         ),
 
-        askQuestion("What is your name?"),
-
-        submitAnswers(answers => {
-          val allAnswers = answers.allTextAnswers
-          s"Thanks for ask, your answers are: [${allAnswers.values.mkString(",")}]"
-        })
+        askQuestion("What is your name?")
       ),
-      personalDialog = true,
-      dialogTTL = 1.minute
+
+      dialogTTL = 1.minute,
+
+      submitAnswers = answers => {
+        val answersText = answers.map {
+          case (questionText, usersAnswers) =>
+            s"$questionText -> ${usersAnswers.map(_.answer).mkString(", ")}"
+        }.mkString("\n")
+        s"Your answers is: \n $answersText"
+      }
     )
 
-    new BotSchema(apiKey, "simpleAsk")
+    createBotSchema()
       .startDialogOnCommand("ask", askPersonalInfo, withPermissions = allowPrivateChats())
   }
 
-  botSchema(apiKey).startBot()
+  botSchema().startBot(apiKey)
 }

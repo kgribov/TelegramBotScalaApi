@@ -1,37 +1,54 @@
 package com.kgribov.telegram.bot
 
-import com.kgribov.telegram.model.Message
-import com.kgribov.telegram.process.MessageProcessor
-import com.kgribov.telegram.source.MessagesSource
+import com.kgribov.telegram.bot.loader.TelUpdate
+import com.kgribov.telegram.bot.func._
+import com.kgribov.telegram.bot.sender.{SendStatistic, TelBotReply}
+import com.kgribov.telegram.bot.state.BotState
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.util.{Failure, Success, Try}
 
-class Bot(messageSource: MessagesSource,
-          messageProcessor: MessageProcessor,
-          loadPeriodSec: Int = 0) extends LazyLogging {
+class Bot(processUpdate: ProcessUpdateFunc,
+          loadUpdateFromOffset: Long => (TelUpdate, Long),
+          sendBotReply: TelBotReply => SendStatistic,
+          saveState: (Long, BotState) => Long,
+          stopBot: Long => Boolean = _ => false) extends LazyLogging {
 
-  def start(stopBot: StopBot = new NeverStopBot): Unit = {
-    while (!stopBot()) {
-      val newMessages = loadNewMessages
+  def processFromOffset(startBotFromOffset: Long = 0,
+                        botState: BotState = BotState()): Unit = {
 
-      messageProcessor.processMessages(newMessages)
+    val (update, nextOffset) = loadUpdatesSafely(startBotFromOffset)
 
-      Thread.sleep(loadPeriodSec * 1000)
+    logger.info(
+      s"Going to process ${update.textMessages.size} text messages, " +
+        s"${update.commandMessages.size} command messages, " +
+        s"${update.keyboardReplies.size} keyboard replies"
+    )
+
+    val (processedState, replies) = processUpdate(botState, update)
+
+    sendBotReply(replies)
+
+    saveState(nextOffset, processedState)
+
+    logger.info(s"Updated state contains ${processedState.dialogsStates.size} dialogs, " +
+      s"${processedState.commandsSchedules.size} scheduled commands")
+
+    if (!stopBot(nextOffset)) {
+      processFromOffset(nextOffset, processedState)
+    } else {
+      logger.info("Bot was stopped by stop-function")
     }
   }
 
-  private def loadNewMessages: List[Message] = {
-    val newMessages = Try(messageSource.loadNewMessages())
+  private def loadUpdatesSafely(fromOffset: Long): (TelUpdate, Long) = {
+    Try(loadUpdateFromOffset(fromOffset)) match {
 
-    newMessages match {
-      case Success(listOfMessages) => {
-        logger.info(s"Received new batch of messages, batch size is ${listOfMessages.size}")
-        listOfMessages
-      }
+      case Success((update, nextOffset)) => (update, nextOffset)
+
       case Failure(ex) => {
-        logger.error("Unable to load new batch of messages", ex)
-        List.empty[Message]
+        logger.error(s"Unable to load new updates from offset=$fromOffset", ex)
+        (TelUpdate(), fromOffset)
       }
     }
   }
