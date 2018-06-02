@@ -3,6 +3,8 @@
 
 # Telegram Bot Scala API
 ![bot logo](http://www.chatterbotcollection.com/images/telegram-bot_1436220825.png)
+## This page and documentation currently is invalid, working on it...
+
 ## Overview
 Would like to write powerfull telegram bots using scala? This project is made for you.
 

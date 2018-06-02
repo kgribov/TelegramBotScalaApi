@@ -10,6 +10,8 @@ import scalaj.http.{Http, HttpRequest}
 
 class TelBotReplySender(apiKey: String, maxRetries: Int = 10) extends LazyLogging {
 
+  private val SLEEP_BETWEEN_RETRIES_IN_SEC = 1
+
   def sendBotReply(botReply: TelBotReply): SendStatistic = {
     val sentAlerts = botReply
       .keyboardAlerts
@@ -70,6 +72,7 @@ class TelBotReplySender(apiKey: String, maxRetries: Int = 10) extends LazyLoggin
         if (tryCount == maxRetries) {
           None
         } else {
+          Thread.sleep(SLEEP_BETWEEN_RETRIES_IN_SEC * 1000)
           sendRequest(httpRequest, tryCount + 1)
         }
       }
