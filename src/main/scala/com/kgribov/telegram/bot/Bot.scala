@@ -6,16 +6,18 @@ import com.kgribov.telegram.bot.sender.{SendStatistic, TelBotReply}
 import com.kgribov.telegram.bot.state.BotState
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.annotation.tailrec
 import scala.util.{Failure, Success, Try}
 
 class Bot(processUpdate: ProcessUpdateFunc,
           loadUpdateFromOffset: Long => (TelUpdate, Long),
           sendBotReply: TelBotReply => SendStatistic,
           saveState: (Long, BotState) => Long,
-          stopBot: Long => Boolean = _ => false) extends LazyLogging {
+          needToStopBot: Long => Boolean = _ => false) extends LazyLogging {
 
-  def processFromOffset(startBotFromOffset: Long = 0,
-                        botState: BotState = BotState()): Unit = {
+  @tailrec
+  final def processFromOffset(startBotFromOffset: Long = 0,
+                              botState: BotState = BotState()): Unit = {
 
     val (update, nextOffset) = loadUpdatesSafely(startBotFromOffset)
 
@@ -31,13 +33,14 @@ class Bot(processUpdate: ProcessUpdateFunc,
 
     saveState(nextOffset, processedState)
 
-    logger.info(s"Updated state contains ${processedState.dialogsStates.size} dialogs, " +
+    logger.info(s"Updated state contains " +
+      s"${processedState.dialogsStates.size} dialogs, " +
       s"${processedState.commandsSchedules.size} scheduled commands")
 
-    if (!stopBot(nextOffset)) {
-      processFromOffset(nextOffset, processedState)
-    } else {
+    if (needToStopBot(nextOffset)) {
       logger.info("Bot was stopped by stop-function")
+    } else {
+      processFromOffset(nextOffset, processedState)
     }
   }
 

@@ -25,7 +25,7 @@ class BotRunner(apiKey: String,
       loadUpdateFromOffset = loader.loadUpdateFromOffset,
       sendBotReply = sender.sendBotReply,
       saveState = stateStore.storeState,
-      stopBot = new StopBotOnSignal
+      needToStopBot = new StopBotOnSignal
     )
 
     bot.processFromOffset()
