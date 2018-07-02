@@ -106,7 +106,14 @@ package object json {
     }
 
     def toCommandMessage: Option[CommandMessage] = {
-      command.map(commandText => CommandMessage(id.toString, from.toModel, commandText, getDate, chat.toModel))
+      command.map(
+        commandText => CommandMessage(
+          id.toString,
+          from.toModel,
+          commandText,
+          getDate,
+          chat.toModel)
+      )
     }
   }
 
